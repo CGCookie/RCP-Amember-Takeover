@@ -368,3 +368,22 @@ function rcp_add_cgc_table_column_content( $user_id ) {
 	echo '<td>' . $payer_id . '</td>';
 }
 add_action( 'rcp_members_page_table_column', 'rcp_add_cgc_table_column_content' );
+
+
+function cgc_rcp_filter_username_length_theme( $user ) {
+	if( strlen( $user['login'] ) < 4 && ! empty( $user['need_new'] ) ) {
+		rcp_errors()->add( 'short_username', 'Username is too short. It must be at least 4 characters.', 'register' );
+	}
+
+	if( strpos( $user['login'], ' ' ) !== false && ! empty( $user['need_new'] ) ){
+		rcp_errors()->add( 'username_spaces', 'Spaces are not allowed in usernames.', 'register' );
+	}
+
+	return $user;
+}
+add_filter( 'rcp_user_registration_data', 'cgc_rcp_filter_username_length_theme' );
+
+function rcp_cgc_validate_username( $valid, $username ) {
+	return true;
+}
+add_filter( 'validate_username', 'rcp_cgc_validate_username', 9999, 2 );
